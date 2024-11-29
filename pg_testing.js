@@ -1,11 +1,18 @@
 import { pgPool } from "./pg_connection.js";
 
-/*try{
+
+
+/*for testing connection to DB
+
+try{
   const result = await pgPool.query("");
   console.log(result.rows);
 }catch(e){
     console.log(e.message);
 }*/
+
+
+/* This function was made for test-inserting data to db, test was succesful
 
 async function insertGenre () {
     try {
@@ -20,7 +27,7 @@ async function insertGenre () {
     }
 }
 
-insertGenre();
+insertGenre();*/
 
 
 
