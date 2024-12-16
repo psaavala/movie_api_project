@@ -46,7 +46,7 @@ app.post('/movie/add',  async (req, res) =>{
     }
 
     /*check for valid year inserted*/
-    
+
     const currentYear = new Date().getFullYear();
     const year = Number(movie_year);
     if (isNaN(year) || year < 1900 || year > currentYear) {
@@ -102,3 +102,27 @@ app.post('/uuser', async (req,res) =>{
 
 });
 
+/* get movie by id endpoint*/
+
+app.get('/movie/:id', async (req, res) =>{
+
+    const movieId = req.params.id;
+
+    // Check if movieId is valid
+
+    if (isNaN(movieId)) {
+        return res.status(400).json({ error: "Invalid movie ID" });
+    }
+
+    try {
+        const result = await pgPool.query('SELECT * FROM movie WHERE movie_id = $1', [movieId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Movie not found" });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
