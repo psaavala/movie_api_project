@@ -38,14 +38,14 @@ app.post('/movie/add',  async (req, res) =>{
 
     const { movie_name, movie_year, genre_id} = req.body;
 
-    /*if (!movie_id || !movie_name || !movie_year || !genre_id) {
-        return res.status(400).json({error: "movie_id, movie_name, movie_year, genre_id are required"});
-    }*/
+    if (!movie_name || !movie_year || !genre_id) {
+        return res.status(400).json({error: "movie_name, movie_year, genre_id are required"});
+    }
 
-    /*const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
     if (typeof movie_year !== 'number' || movie_year < 1900 || movie_year > currentYear) {
         return res.status(400).json({ error: `movie_year must be a valid year between 1900 and ${currentYear}` });
-    }*/
+    }
 
     try {
         await pgPool.query(
