@@ -1,5 +1,6 @@
 import express from 'express';
 import { pgPool } from "./pg_connection.js";
+import bcrypt from 'bcrypt';
 var app = express();
 
 
@@ -57,5 +58,39 @@ app.post('/movie/add',  async (req, res) =>{
     } catch (error) {
         res.status(400).json({error: error.message})
     }
+});
+
+
+
+
+app.post('/uuser', async (req,res) =>{
+
+    const {name, username, password, birthday} = req.body;
+
+    try {
+        const userExists = await pgPool.query(
+            'SELECT * FROM uuser WHERE username = $1',
+            [username]
+        );
+
+        if (userExists.rows.length > 0) {
+            return res.status(409).json({ error: "Username already exists" });
+        }
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        await pgPool.query(
+            'INSERT INTO uuser (name, username, password, birthday) VALUES ($1, $2, $3, $4)',
+            [name, username, hashedPassword, birthday]
+        );
+        res.status(201).json({ message: "User added succesfully"});
+    } catch (error) {
+        res.status(400).json({error: error.message})
+    }
+
+
+
+
 });
 
