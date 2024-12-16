@@ -108,7 +108,7 @@ app.get('/movie/:id', async (req, res) =>{
 
     const movieId = req.params.id;
 
-    // Check if movieId is valid
+     /*Check if movieId is valid*/
 
     if (isNaN(movieId)) {
         return res.status(400).json({ error: "Invalid movie ID" });
@@ -123,6 +123,35 @@ app.get('/movie/:id', async (req, res) =>{
 
         res.status(200).json(result.rows[0]);
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+/* delete movie by id endpoint*/
+
+app.delete('/movie/:id', async (req, res) => {
+    const movieDelId = req.params.id;
+
+    /*Check id movieID is valid*/
+
+    if (isNaN(movieDelId)) {
+        return res.status(400).json({ error: "Invalid movie ID" });
+    }
+
+    try {
+        
+        const result = await pgPool.query('DELETE FROM movie WHERE movie_id = $1 RETURNING *', [movieDelId]);
+
+        if (result.rowCount === 0) {
+            
+            return res.status(404).json({ error: "Movie not found" });
+        }
+
+        
+        res.status(200).json({ message: "Movie deleted successfully", movie: result.rows[0] });
+    } catch (error) {
+       
         res.status(500).json({ error: error.message });
     }
 });
