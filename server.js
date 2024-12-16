@@ -36,7 +36,7 @@ app.post('/genre', async (req, res) =>{
 
 app.post('/movie/add',  async (req, res) =>{
 
-    const { movie_id, movie_name, movie_year, genre_id} = req.body;
+    const { movie_name, movie_year, genre_id} = req.body;
 
     /*if (!movie_id || !movie_name || !movie_year || !genre_id) {
         return res.status(400).json({error: "movie_id, movie_name, movie_year, genre_id are required"});
@@ -48,9 +48,13 @@ app.post('/movie/add',  async (req, res) =>{
     }*/
 
     try {
-        await pgPool.query('INSERT INTO movies VALUES ($1,$2,$3,$4)', [movie_id, movie_name, movie_year, genre_id]);
+        await pgPool.query(
+            'INSERT INTO movie (movie_name, movie_year, genre_id) VALUES ($1, $2, $3)',
+            [movie_name, movie_year, genre_id]
+        );
         res.status(201).json({ message: "Movie added succesfully"});
     } catch (error) {
         res.status(400).json({error: error.message})
     }
 });
+
