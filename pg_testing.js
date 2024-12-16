@@ -12,12 +12,12 @@ try{
 }*/
 
 
-/* This function was made for test-inserting data to db, test was succesful
+ /*This function was made for test-inserting data to db, test was succesful
 
 async function insertGenre () {
     try {
         const query = "INSERT INTO genre (genre_id, genre_name) VALUES ($1,$2) RETURNING*";
-        const values = [8, 'anime'];
+        const values = [genre_id, genre_name];
 
         const result = await pgPool.query(query, values);
 
@@ -27,9 +27,9 @@ async function insertGenre () {
     }
 }
 
-insertGenre();*/
+insertGenre();
 
-
+*/
 
 
 
