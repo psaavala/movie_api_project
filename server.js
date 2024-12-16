@@ -13,7 +13,7 @@ app.listen(port, () =>{
 });
 
 
-/*add genres*/
+/*add genres endpoint*/
 
 app.post('/genre', async (req, res) =>{
 
@@ -33,16 +33,20 @@ app.post('/genre', async (req, res) =>{
 });
 
 
-
+/*add movies endpoint*/
 
 app.post('/movie/add',  async (req, res) =>{
 
     const { movie_name, movie_year, genre_id} = req.body;
 
+    /*check for fields are not empty*/
+
     if (!movie_name || !movie_year || !genre_id) {
         return res.status(400).json({error: "movie_name, movie_year, genre_id are required"});
     }
 
+    /*check for valid year inserted*/
+    
     const currentYear = new Date().getFullYear();
     const year = Number(movie_year);
     if (isNaN(year) || year < 1900 || year > currentYear) {
@@ -61,11 +65,13 @@ app.post('/movie/add',  async (req, res) =>{
 });
 
 
-
+/*add users endpoint*/
 
 app.post('/uuser', async (req,res) =>{
 
     const {name, username, password, birthday} = req.body;
+
+    /*check if user already exists*/
 
     try {
         const userExists = await pgPool.query(
@@ -76,6 +82,8 @@ app.post('/uuser', async (req,res) =>{
         if (userExists.rows.length > 0) {
             return res.status(409).json({ error: "Username already exists" });
         }
+
+    /*hash password with bcrypt*/
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
