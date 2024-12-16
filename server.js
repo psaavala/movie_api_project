@@ -43,7 +43,8 @@ app.post('/movie/add',  async (req, res) =>{
     }
 
     const currentYear = new Date().getFullYear();
-    if (typeof movie_year !== 'number' || movie_year < 1900 || movie_year > currentYear) {
+    const year = Number(movie_year);
+    if (isNaN(year) || year < 1900 || year > currentYear) {
         return res.status(400).json({ error: `movie_year must be a valid year between 1900 and ${currentYear}` });
     }
 
