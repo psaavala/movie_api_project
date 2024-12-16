@@ -155,3 +155,17 @@ app.delete('/movie/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+/* get all movies endpoint*/
+
+app.get('/movies', async (req,res) =>{
+
+    try {
+        const query ='SELECT movie.movie_id, movie.movie_name, movie.movie_year, genre.genre_name FROM movie JOIN genre ON movie.genre_id = genre.genre_id ORDER BY movie.movie_id';
+        const result = await pgPool.query(query);
+        res.status(200).json({ message: "Received all movies succesfully", movies: result.rows });
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+});
