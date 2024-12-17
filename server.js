@@ -160,12 +160,72 @@ app.delete('/movie/:id', async (req, res) => {
 /* get all movies endpoint*/
 
 app.get('/movies', async (req,res) =>{
+    
+    const page = parseInt(req.query.page) || 1;
+    const moviesPerPage = 10;
+
+    const offset = (page - 1) * moviesPerPage;
 
     try {
-        const query ='SELECT movie.movie_id, movie.movie_name, movie.movie_year, genre.genre_name FROM movie JOIN genre ON movie.genre_id = genre.genre_id ORDER BY movie.movie_id';
-        const result = await pgPool.query(query);
-        res.status(200).json({ message: "Received all movies succesfully", movies: result.rows });
+        const query ='SELECT movie.movie_id, movie.movie_name, movie.movie_year, genre.genre_name FROM movie JOIN genre ON movie.genre_id = genre.genre_id ORDER BY movie.movie_id LIMIT $1 OFFSET $2';
+        const result = await pgPool.query(query, [moviesPerPage, offset]);
+        res.status(200).json({ message: "Received movies succesfully", currentpage: page, moviesPerPage: moviesPerPage, movies: result.rows });
     } catch (error) {
         res.status(500).json({error: error.message})
     }
 });
+
+
+
+/* get all movies by keyword*/
+
+app.get('/movies/search', async (req,res) =>{
+
+    const { keyword } = req.query;
+
+    /*Check for empty search(valid keyword) */
+
+    if (!keyword) {
+        return res.status(400).json({ error: "Keyword is required" });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                movie.movie_id, 
+                movie.movie_name, 
+                movie.movie_year, 
+                genre.genre_name 
+            FROM 
+                movie 
+            JOIN 
+                genre 
+            ON 
+                movie.genre_id = genre.genre_id 
+            WHERE 
+                movie.movie_name ILIKE $1
+            ORDER BY 
+                movie.movie_id;
+        `;
+        
+        /* Allow search results by partial matching with '%' */
+
+        const result = await pgPool.query(query, [`%${keyword}%`]);
+
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "No movies found for the given keyword" });
+        }
+
+        
+        res.status(200).json({ 
+            message: "Movies retrieved successfully", 
+            movies: result.rows 
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
