@@ -227,7 +227,7 @@ app.get('/movies/search', async (req,res) =>{
     }
 });
 
-
+/*Endpoint for reviewing movies*/
 
 app.post('/movie/review', async (req, res) => {
     const { id, movie_id, review_stars, review_text } = req.body;
@@ -272,6 +272,47 @@ app.post('/movie/review', async (req, res) => {
         res.status(201).json({
             message: "Review posted successfully",
             review: result.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+/*Endpoint for make user favourite movies*/
+
+
+app.post('/movie/favorite', async (req, res) => {
+    const { id, movie_id } = req.body;
+
+    /* Check for valid input */
+    if (!id || !movie_id) {
+        return res.status(400).json({
+            error: "Both user ID (id) and movie ID (movie_id) are required"
+        });
+    }
+
+    try {
+      
+        const query = `
+            INSERT INTO fav_movie (id, movie_id)
+            VALUES ($1, $2)
+            ON CONFLICT (id, movie_id) DO NOTHING
+            RETURNING *;
+        `;
+
+        const result = await pgPool.query(query, [id, movie_id]);
+
+      
+        if (result.rowCount === 0) {
+            return res.status(409).json({
+                message: "This movie is already in the user's favorites"
+            });
+        }
+
+        res.status(201).json({
+            message: "Movie added to favorites successfully",
+            favorite: result.rows[0]
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
