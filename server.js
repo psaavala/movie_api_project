@@ -318,3 +318,47 @@ app.post('/movie/favorite', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+
+/*Endpoint for fetching users favourite movies by username*/
+
+app.get('/movies/favorites', async (req, res) => {
+    const { username } = req.query;
+
+    /* Check for valid input*/
+    if (!username) {
+        return res.status(400).json({ error: "Username is required" });
+    }
+
+    try {
+        /* SQL query to get favorite movies by username */
+        const query = `
+            SELECT movie.movie_id, movie.movie_name, movie.movie_year, genre.genre_name
+            FROM fav_movie
+            JOIN uuser ON fav_movie.id = uuser.id
+            JOIN movie ON fav_movie.movie_id = movie.movie_id
+            JOIN genre ON movie.genre_id = genre.genre_id
+            WHERE uuser.username = $1;
+        `;
+
+       
+        const result = await pgPool.query(query, [username]);
+
+        /* Check if user has no favorite movies */
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "No favorite movies found for the given username"
+            });
+        }
+
+
+        res.status(200).json({
+            message: "Favorite movies retrieved successfully",
+            favorites: result.rows
+        });
+    } catch (error) {
+
+        res.status(500).json({ error: error.message });
+    }
+});
