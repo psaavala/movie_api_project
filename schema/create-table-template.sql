@@ -36,8 +36,10 @@ CREATE TABLE review(
     review_stars INT CHECK (review_stars BETWEEN 1 and 5),
     review_text TEXT,
     movie_id INT,
-    FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
+    FOREIGN KEY (movie_id) REFERENCES movie(movie_id),
+    UNIQUE (id, movie_id)
 );
+
 
 INSERT INTO genre (genre_id, genre_name) VALUES 
 (1, 'action'),
