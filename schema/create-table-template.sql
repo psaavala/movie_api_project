@@ -29,17 +29,16 @@ CREATE TABLE fav_movie(
     PRIMARY KEY (id, movie_id)
 );
 
-CREATE TABLE review(
+CREATE TABLE review (
     review_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     id INT,
     FOREIGN KEY (id) REFERENCES uuser(id),
-    review_stars INT CHECK (review_stars BETWEEN 1 AND 5),
-    review_text TEXT,
     movie_id INT,
     FOREIGN KEY (movie_id) REFERENCES movie(movie_id),
+    review_stars INT CHECK (review_stars BETWEEN 1 AND 5),
+    review_text TEXT,
     UNIQUE (id, movie_id)
 );
-
 
 INSERT INTO genre (genre_id, genre_name) VALUES 
 (1, 'action'),
