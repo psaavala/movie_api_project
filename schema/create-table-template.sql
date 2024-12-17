@@ -30,10 +30,10 @@ CREATE TABLE fav_movie(
 );
 
 CREATE TABLE review(
-    review_id INT PRIMARY KEY NOT NULL,
+    review_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     id INT,
     FOREIGN KEY (id) REFERENCES uuser(id),
-    review_stars INT CHECK (review_stars BETWEEN 1 and 5),
+    review_stars INT CHECK (review_stars BETWEEN 1 AND 5),
     review_text TEXT,
     movie_id INT,
     FOREIGN KEY (movie_id) REFERENCES movie(movie_id),
