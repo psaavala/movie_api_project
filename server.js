@@ -229,3 +229,51 @@ app.get('/movies/search', async (req,res) =>{
 
 
 
+app.post('/movie/review', async (req, res) => {
+    const { id, movie_id, review_stars, review_text } = req.body;
+
+    /* Check for valid input */
+    if (!id || !movie_id || !review_stars || !review_text) {
+        return res.status(400).json({
+            error: "All fields (id, movie_id, review_stars, review_text) are required"
+        });
+    }
+
+    /* Check for right amount of stars */
+    if (review_stars < 1 || review_stars > 5) {
+        return res.status(400).json({
+            error: "review_stars must be between 1 and 5"
+        });
+    }
+
+    try {
+        /* Check if a review already exists for the user and movie */
+        const checkQuery = `
+            SELECT * FROM review 
+            WHERE id = $1 AND movie_id = $2;
+        `;
+
+        const checkResult = await pgPool.query(checkQuery, [id, movie_id]);
+
+        if (checkResult.rows.length > 0) {
+            return res.status(409).json({
+                error: "User has already reviewed this movie"
+            });
+        }
+
+        const insertQuery = `
+            INSERT INTO review (id, movie_id, review_stars, review_text)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
+        `;
+
+        const result = await pgPool.query(insertQuery, [id, movie_id, review_stars, review_text]);
+
+        res.status(201).json({
+            message: "Review posted successfully",
+            review: result.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
